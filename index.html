@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>Time’s Up! 平衡挑戰行動版</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root { 
+      --navy: #2c3e50; 
+      --cream: #f4f1ea; 
+      --accent: #e67e22; 
+      --white: #ffffff; 
+      --text: #2c3e50; 
+      --border-radius: 16px;
+    }
+    
+    * { box-sizing: border-box; font-family: "PingFang TC", "Heiti TC", sans-serif; }
+    
+    body { 
+      margin: 0; 
+      background: var(--navy); 
+      background-image: radial-gradient(#34495e 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: var(--text); 
+      -webkit-tap-highlight-color: transparent; 
+    }
+    
+    .container { width: 100%; max-width: 450px; margin: 0 auto; padding: 12px; }
+    
+    .card { 
+      background: var(--cream); 
+      border-radius: var(--border-radius); 
+      padding: 20px; 
+      margin-bottom: 16px; 
+      box-shadow: 0 8px 0 rgba(0,0,0,0.15); 
+      border: 3px solid var(--white);
+    }
+    
+    h1, h2 { text-align: center; color: var(--navy); margin-top: 0; }
+    h1 { font-size: 1.6rem; border-bottom: 2px dashed var(--navy); padding-bottom: 8px; margin-bottom: 15px; }
+    
+    .rule-box { font-size: 13px; line-height: 1.5; }
+    .rule-item { display: flex; border-bottom: 1px solid #ccc; padding: 8px 0; }
+    .rule-label { font-weight: bold; width: 70px; flex-shrink: 0; color: var(--navy); }
+    
+    #setup-card { min-height: 50vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .mobile-input { 
+      width: 100%; 
+      padding: 14px; 
+      border: 3px solid var(--navy); 
+      border-radius: 12px; 
+      font-size: 18px; 
+      text-align: center; 
+      margin-bottom: 20px;
+      background: var(--white);
+    }
+
+    .day-record-card {
+      background: var(--white);
+      border: 2px solid var(--navy);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    .day-title {
+      font-weight: 900;
+      color: var(--navy);
+      border-bottom: 1px solid #eee;
+      margin-bottom: 12px;
+      padding-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .top-input-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+    
+    .bottom-input-full {
+      border-top: 1px dashed #ddd;
+      padding-top: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .input-label {
+      font-size: 11px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #666;
+    }
+    .score-in { 
+      width: 100%; 
+      height: 40px; 
+      border: 2px solid var(--navy); 
+      border-radius: 8px; 
+      text-align: center; 
+      font-size: 16px; 
+      font-weight: bold;
+    }
+    .score-in:disabled { background: #e74c3c; color: white; border-color: #c0392b; }
+    
+    .time-in {
+      width: 60%;
+      height: 45px;
+      border: 2px solid var(--accent);
+      background-color: #f9fafb;
+      color: var(--navy);
+    }
+
+    .btn { 
+      width: 100%; 
+      padding: 16px; 
+      border-radius: 50px; 
+      border: none; 
+      font-size: 17px; 
+      font-weight: 900; 
+      cursor: pointer; 
+      transition: 0.2s; 
+      margin-top: 10px;
+      box-shadow: 0 5px 0 rgba(0,0,0,0.1);
+    }
+    .btn-main { background: var(--accent); color: white; }
+    .btn-save { background: #27ae60; color: white; }
+    .btn-secondary { background: #7f8c8d; color: white; }
+
+    .badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+    .bust-tag { background: #e74c3c; color: white; }
+    .perfect-tag { background: #2ecc71; color: white; }
+
+    .personality-card { 
+      background: var(--white); 
+      border: 3px solid var(--navy); 
+      padding: 16px; 
+      border-radius: var(--border-radius); 
+      margin-top: 15px;
+    }
+    canvas { max-width: 100% !important; height: auto !important; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    <h2 style="font-size: 1.1rem; margin-bottom: 8px;">核心規則摘要</h2>
+    <div class="rule-box">
+      <div class="rule-item"><div class="rule-label">時間限制</div><div>單日累計使用時間不得超過 24 小時。<br>超過則爆牌，當日得分為0。</div></div>
+      <div class="rule-item"><div class="rule-label">基本設置</div><div>每回合固定含有上學卡以及睡覺卡（共 12 小時）。<br>扣除後所剩 12 小時，則為玩家可自由分配之時間。</div></div>
+      <div class="rule-item"><div class="rule-label">得分原則</div><div>隨卡牌標示選擇或安排四面向耗時。</div></div>
+      <div class="rule-item"><div class="rule-label">平衡差距</div><div>平衡差距 = 最高分 − 最低分。數值越小生活越均衡。</div></div>
+    </div>
+  </div>
+
+  <div class="card" id="setup-card">
+    <h1>TIME’S UP!</h1>
+    <p style="color: #7f8c8d; margin-bottom: 25px; font-weight: bold; font-size: 14px;">生命平衡挑戰計分器</p>
+    <input type="text" id="playerName" class="mobile-input" placeholder="請輸入冒險者姓名" autofocus>
+    <button class="btn btn-main" id="startBtn">開始挑戰</button>
+  </div>
+
+  <div class="card" id="score-card" style="display:none;">
+    <h2 id="pNameDisplay" style="font-size: 1rem; margin-bottom: 15px; border-bottom: 2px solid var(--navy); display: inline-block;"></h2>
+    <div id="currentDayArea"></div>
+    <button class="btn btn-main" id="nextDayBtn">進入下一回合</button>
+    <button class="btn btn-main" id="calcBtn" style="display:none;">產出結算報告</button>
+  </div>
+
+  <div id="result-wrapper" style="display:none;">
+    <div class="card" id="capture-area">
+      <h2 style="margin-bottom: 10px; font-size: 1.3rem;">最終生命平衡輪報告</h2>
+      <p id="resName" style="text-align:center; font-size: 13px; font-weight: bold; color: var(--navy); margin-bottom: 10px;"></p>
+      
+      
+      <canvas id="radarChart"></canvas>
+      
+      <div id="analysisResult" class="personality-card"></div>
+    </div>
+    <div class="container" style="padding: 0;">
+      <button class="btn btn-save" id="downloadBtn">下載分析結果圖片</button>
+      <button class="btn btn-secondary" onclick="location.reload()">重新挑戰</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let user = "";
+  let currentDay = 1;
+  const TOTAL_DAYS = 5;
+  // 儲存各天資料
+  const dailyData = [];
+
+  document.getElementById('startBtn').onclick = () => {
+    user = document.getElementById('playerName').value.trim();
+    if (!user) return alert("請輸入姓名");
+    document.getElementById('setup-card').style.display = 'none';
+    document.getElementById('score-card').style.display = 'block';
+    document.getElementById('pNameDisplay').innerText = `受測者：${user}`;
+    showDayInput(currentDay);
+  };
+
+  function showDayInput(day) {
+    const container = document.getElementById('currentDayArea');
+    container.innerHTML = `
+      <div class="day-record-card">
+        <div class="day-title">
+          <span>DAY ${day}</span>
+          <span id="st_${day}" style="font-size:11px;">剩餘 12h</span>
+        </div>
+        <div class="top-input-grid">
+          <div class="input-group"><span class="input-label">學習</span><input type="number" id="l_${day}" class="score-in" value="6" oninput="autoSum(${day})"></div>
+          <div class="input-group"><span class="input-label">健康</span><input type="number" id="h_${day}" class="score-in" value="6" oninput="autoSum(${day})"></div>
+          <div class="input-group"><span class="input-label">社交</span><input type="number" id="s_${day}" class="score-in" value="0" oninput="autoSum(${day})"></div>
+          <div class="input-group"><span class="input-label">心情</span><input type="number" id="m_${day}" class="score-in" value="0" oninput="autoSum(${day})"></div>
+        </div>
+        <div class="bottom-input-full">
+          <span class="input-label" style="color:var(--accent); font-size:12px;">今日總耗時 (上限 24h)</span>
+          <input type="number" id="t_${day}" class="score-in time-in" value="12" readonly>
+        </div>
+      </div>
+    `;
+    
+    // 按鈕控制
+    if (day === TOTAL_DAYS) {
+      document.getElementById('nextDayBtn').style.display = 'none';
+      document.getElementById('calcBtn').style.display = 'block';
+    }
+  }
+
+  window.autoSum = (d) => {
+    const l = parseFloat(document.getElementById(`l_${d}`).value) || 0;
+    const h = parseFloat(document.getElementById(`h_${d}`).value) || 0;
+    const s = parseFloat(document.getElementById(`s_${d}`).value) || 0;
+    const m = parseFloat(document.getElementById(`m_${d}`).value) || 0;
+    
+    // 日常卡設置基數 
+    const total = l + h + s + m;
+    const timeIn = document.getElementById(`t_${d}`);
+    const st = document.getElementById(`st_${d}`);
+
+    timeIn.value = total;
+
+    if (total > 24) {
+      st.innerHTML = `<span class="badge bust-tag">BUSTED! 爆牌</span>`;
+      timeIn.style.borderColor = "#e74c3c";
+      timeIn.style.backgroundColor = "#fee2e2";
+    } else {
+      timeIn.style.borderColor = "var(--accent)";
+      timeIn.style.backgroundColor = "#f9fafb";
+      if (total === 24) {
+        st.innerHTML = `<span class="badge perfect-tag">PERFECT!</span>`;
+      } else {
+        st.innerHTML = `剩餘 ${24 - total}h`;
+      }
+    }
+  };
+
+  document.getElementById('nextDayBtn').onclick = () => {
+    saveCurrentDayData();
+    currentDay++;
+    showDayInput(currentDay);
+    window.scrollTo(0, 0); // 回到上方看規則
+  };
+
+  function saveCurrentDayData() {
+    const d = currentDay;
+    const t = parseFloat(document.getElementById(`t_${d}`).value) || 0;
+    
+    // 爆牌判定處理 
+    if (t > 24) {
+      dailyData.push({ l: 0, h: 0, s: 0, m: 0, t: t });
+    } else {
+      dailyData.push({
+        l: Math.max(0, parseFloat(document.getElementById(`l_${d}`).value) || 0),
+        h: Math.max(0, parseFloat(document.getElementById(`h_${d}`).value) || 0),
+        s: Math.max(0, parseFloat(document.getElementById(`s_${d}`).value) || 0),
+        m: Math.max(0, parseFloat(document.getElementById(`m_${d}`).value) || 0),
+        t: t
+      });
+    }
+  }
+
+  document.getElementById('calcBtn').onclick = () => {
+    saveCurrentDayData(); // 儲存最後一天
+    
+    let sumL=0, sumH=0, sumS=0, sumM=0;
+    dailyData.forEach(data => {
+      sumL += data.l;
+      sumH += data.h;
+      sumS += data.s;
+      sumM += data.m;
+    });
+
+    const gap = Math.max(sumL, sumH, sumS, sumM) - Math.min(sumL, sumH, sumS, sumM);
+    document.getElementById('score-card').style.display = 'none';
+    document.getElementById('result-wrapper').style.display = 'block';
+    document.getElementById('resName').innerText = `冒險者：${user}`;
+    drawRadar(sumL, sumH, sumS, sumM);
+    runAnalysis(sumL, sumH, sumS, sumM, gap);
+  };
+
+  function runAnalysis(L, H, S, M, gap) {
+    const total = L + H + S + M;
+    let type = "";
+    if (gap <= 5 && total > 80) type = "【全方位平衡高手】時間管理王者！";
+    else {
+      const top = Math.max(L, H, S, M);
+      if (top === 0) type = "【混合探索者】還在尋找最舒適的生活節奏。";
+      else if (L === top) type = "【學習衝刺型】目標感強，但別忘了休息。";
+      else if (H === top) type = "【健康守門員】作息穩定，是長跑型選手。";
+      else if (S === top) type = "【社交連結者】人際關係滿分，注意分配給自己時間。";
+      else if (M === top) type = "【快樂追尋者】在意情緒品質，記得面對現實壓力。";
+      else type = "【混合探索者】還在尋找最舒適的生活節奏。";
+    }
+    document.getElementById('analysisResult').innerHTML = `
+      <div style="font-size: 15px; font-weight: 900; color: var(--navy); border-bottom: 2px solid var(--navy); margin-bottom: 8px; padding-bottom: 4px;">平衡差距：${gap}</div>
+      <div style="font-size: 14px; line-height: 1.5; font-weight: bold;">${type}</div>
+    `;
+  }
+
+  function drawRadar(L, H, S, M) {
+    new Chart(document.getElementById('radarChart'), {
+      type: 'radar',
+      data: {
+        labels: ['學習', '健康', '社交', '心情'],
+        datasets: [{
+          data: [L, H, S, M],
+          backgroundColor: 'rgba(230, 126, 34, 0.3)',
+          borderColor: '#e67e22',
+          borderWidth: 3,
+          pointBackgroundColor: '#2c3e50',
+          pointRadius: 4
+        }]
+      },
+      options: {
+        scales: {
+          r: {
+            beginAtZero: true,
+            ticks: { display: false },
+            pointLabels: { font: { size: 13, weight: 'bold' }, color: '#2c3e50' }
+          }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
+
+  document.getElementById('downloadBtn').onclick = () => {
+    const btn = document.getElementById('downloadBtn');
+    btn.innerText = "生成圖片中...";
+    html2canvas(document.getElementById('capture-area'), { scale: 2, backgroundColor: '#f4f1ea' }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = `Balance_Report_${user}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+      btn.innerText = "下載分析結果圖片";
+    });
+  };
+</script>
+
+</body>
+</html>
