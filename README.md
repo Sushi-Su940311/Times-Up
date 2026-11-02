@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>Time’s Up!</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root { 
+      /* 卡牌提取配色 */
+      --main-dark: #453020;  /* 深咖啡色 */
+      --main-light: #9BBA54; /* 草綠色 */
+      --cream: #F9F6F0;      /* 暖白底色 */
+      
+      --white: #ffffff; 
+      --text: #453020; 
+      --border-radius: 16px;
+      --red: #d35400;
+    }
+    
+    * { box-sizing: border-box; font-family: "PingFang TC", "Heiti TC", sans-serif; }
+    
+    body { 
+      margin: 0; 
+      background: var(--main-dark); 
+      background-image: radial-gradient(#5a412d 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: var(--text); 
+      -webkit-tap-highlight-color: transparent; 
+    }
+    
+    .container { width: 100%; max-width: 450px; margin: 0 auto; padding: 12px; }
+    
+    .card { 
+      background: var(--cream); 
+      border-radius: var(--border-radius); 
+      padding: 20px; 
+      margin-bottom: 16px; 
+      box-shadow: 0 8px 0 rgba(0,0,0,0.2); 
+      border: 3px solid var(--white);
+    }
+    
+    h1, h2 { text-align: center; color: var(--main-dark); margin-top: 0; }
+    h1 { font-size: 1.6rem; border-bottom: 2px dashed var(--main-dark); padding-bottom: 8px; margin-bottom: 15px; }
+    
+    /* 規則區塊新樣式 */
+    .rule-header {
+      font-size: 1.1rem; 
+      margin: 0; 
+      cursor: pointer; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+    }
+    .rule-toggle-icon {
+      font-size: 0.85rem;
+      background: var(--main-dark);
+      color: var(--main-light);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: bold;
+    }
+    .rule-box { font-size: 13px; line-height: 1.5; margin-top: 15px; }
+    .rule-item { display: flex; border-bottom: 1px solid #dcd1c4; padding: 8px 0; }
+    .rule-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .rule-label { font-weight: bold; width: 75px; flex-shrink: 0; color: var(--main-dark); }
+    
+    #setup-card { min-height: 50vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    
+    /* 標誌圖片樣式 */
+    .logo-img {
+      max-width: 50%; /* 控制圖片最大寬度 */
+      height: auto;
+      margin-bottom: 15px;
+    }
+
+    .mobile-input { 
+      width: 100%; padding: 14px; border: 3px solid var(--main-dark); border-radius: 12px; 
+      font-size: 18px; text-align: center; margin-bottom: 20px; background: var(--white);
+      color: var(--main-dark); font-weight: bold;
+    }
+
+    .day-record-card {
+      background: var(--white); border: 2px solid var(--main-dark); border-radius: 12px;
+      padding: 15px; margin-bottom: 15px;
+    }
+    .day-title {
+      font-weight: 900; color: var(--main-dark); border-bottom: 2px solid #eee;
+      margin-bottom: 12px; padding-bottom: 8px; display: flex;
+      justify-content: space-between; align-items: center; font-size: 1.1rem;
+    }
+    
+    .aspect-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px dashed #dcd1c4;
+    }
+    .aspect-row:last-child { border-bottom: none; }
+    .aspect-info { display: flex; align-items: center; width: 45%; }
+    .aspect-label { font-weight: bold; font-size: 14px; margin-right: 8px; color: var(--main-dark); }
+    .aspect-score { 
+      background: var(--main-dark); color: var(--main-light); padding: 4px 10px; 
+      border-radius: 8px; font-weight: bold; font-size: 16px; min-width: 40px; text-align: center;
+    }
+    
+    .aspect-actions { display: flex; gap: 10px; width: 55%; justify-content: flex-end; }
+    .act-btn {
+      border: 2px solid var(--main-dark); border-radius: 6px; background: #fff;
+      font-weight: bold; padding: 6px 0; width: 50px; cursor: pointer;
+      font-size: 15px; transition: 0.1s; color: var(--main-dark);
+    }
+    .act-btn:active { transform: scale(0.95); background: #eee; }
+
+    .time-tracker {
+      background: #f4f6f0; border: 2px solid var(--main-light); border-radius: 8px;
+      padding: 12px; text-align: center; margin-top: 15px; font-weight: bold; font-size: 15px;
+      color: var(--main-dark);
+    }
+    .time-tracker.busted { background: #fee2e2; border-color: var(--red); color: var(--red); }
+
+    .btn { 
+      width: 100%; padding: 16px; border-radius: 50px; border: none; 
+      font-size: 17px; font-weight: 900; cursor: pointer; transition: 0.2s; 
+      margin-top: 10px; box-shadow: 0 5px 0 rgba(0,0,0,0.15);
+    }
+    .btn-main { background: var(--main-light); color: var(--main-dark); box-shadow: 0 5px 0 #7A9641; }
+    .btn-main:active { transform: translateY(3px); box-shadow: 0 2px 0 #7A9641; }
+    
+    .btn-save { background: var(--main-dark); color: var(--main-light); }
+    .btn-secondary { background: #95a5a6; color: white; }
+    .btn-undo { background: #e67e22; color: white; margin-bottom: 10px; box-shadow: 0 4px 0 #d35400; }
+
+    .busted-overlay {
+      color: var(--red); font-weight: bold; font-size: 13px; text-align: center; margin-top: 5px;
+    }
+
+    .badge { font-size: 10px; padding: 3px 6px; border-radius: 4px; font-weight: bold; color: white;}
+    .bust-tag { background: var(--red); }
+
+    .personality-card { 
+      background: var(--white); border: 3px solid var(--main-dark); 
+      padding: 16px; border-radius: var(--border-radius); margin-top: 15px;
+    }
+
+    .rank-list { margin-top: 10px; padding-left: 20px; font-size: 14px; font-weight: bold; line-height: 1.6;}
+    canvas { max-width: 100% !important; height: auto !important; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    <h2 class="rule-header" onclick="toggleRules()">
+      <span>核心規則</span>
+      <span class="rule-toggle-icon" id="ruleIcon">▼ 展開</span>
+    </h2>
+    <div class="rule-box" id="ruleContent" style="display: none;">
+      <div class="rule-item"><div class="rule-label">基本設置</div><div>每日含有固定作息（12小時）。<br>所剩 12 小時為可自由分配時間。</div></div>
+      <div class="rule-item"><div class="rule-label">操作計時</div><div>每按一次「＋1」或「－1」，耗時即增加1小時。<br>分數最低為0，但降至0後再扣減，<b>耗時仍會累加</b>。</div></div>
+      <div class="rule-item"><div class="rule-label">特殊操作</div><div><b>撤銷：</b>還原上一步誤按的操作及時間。</div></div>
+      <div class="rule-item"><div class="rule-label">爆牌歸零</div><div>累計超過24小時即爆牌，<b>當日四項得分歸零</b>並記一次爆牌（不額外增加耗時）。</div></div>
+    </div>
+  </div>
+
+  <div class="card" id="setup-card">
+    <img src="./LOGO.png" alt="TIME'S UP!" class="logo-img">
+    <p></p>
+    <input type="text" id="playerName" class="mobile-input" placeholder="請輸入冒險者姓名" autofocus>
+    <button class="btn btn-main" id="startBtn">開始挑戰</button>
+  </div>
+
+  <div class="card" id="score-card" style="display:none;">
+    <h2 id="pNameDisplay" style="font-size: 1rem; margin-bottom: 15px; border-bottom: 2px solid var(--main-dark); display: inline-block;"></h2>
+    <div id="currentDayArea"></div>
+    <button class="btn btn-undo" id="undoBtn" onclick="undoAction()">↺ 撤銷上一步</button>
+    <button class="btn btn-main" id="nextDayBtn">儲存並進入下一回合</button>
+    <button class="btn btn-main" id="calcBtn" style="display:none;">產出結算報告</button>
+  </div>
+
+  <div id="result-wrapper" style="display:none;">
+    <div class="card" id="capture-area">
+      <h2 style="margin-bottom: 10px; font-size: 1.3rem;">最終生命平衡輪報告</h2>
+      <p id="resName" style="text-align:center; font-size: 13px; font-weight: bold; color: var(--main-dark); margin-bottom: 10px;"></p>
+      
+      <canvas id="radarChart"></canvas>
+      <div id="analysisResult" class="personality-card"></div>
+    </div>
+    <div class="container" style="padding: 0;">
+      <button class="btn btn-save" id="downloadBtn">下載分析結果圖片</button>
+      <button class="btn btn-secondary" onclick="location.reload()">重新挑戰</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 規則區塊收合控制
+  function toggleRules() {
+    const content = document.getElementById('ruleContent');
+    const icon = document.getElementById('ruleIcon');
+    if (content.style.display === 'none') {
+      content.style.display = 'block';
+      icon.innerText = '▲ 收起';
+    } else {
+      content.style.display = 'none';
+      icon.innerText = '▼ 展開';
+    }
+  }
+
+  let user = "";
+  let currentDay = 1;
+  const TOTAL_DAYS = 3; 
+  const dailyData = [];
+
+  let dayState = {
+    scores: { L: 6, H: 6, S: 0, M: 0 },
+    time: 12,
+    history: []
+  };
+
+  const aspectNames = { L: '學習', H: '健康', S: '社交', M: '心情' };
+
+  document.getElementById('startBtn').onclick = () => {
+    user = document.getElementById('playerName').value.trim();
+    if (!user) return alert("請輸入姓名");
+    document.getElementById('setup-card').style.display = 'none';
+    document.getElementById('score-card').style.display = 'block';
+    document.getElementById('pNameDisplay').innerText = `受測者：${user}`;
+    renderDayUI();
+  };
+
+  function renderDayUI() {
+    const container = document.getElementById('currentDayArea');
+    const isBusted = dayState.time > 24;
+    
+    const displayL = isBusted ? 0 : dayState.scores.L;
+    const displayH = isBusted ? 0 : dayState.scores.H;
+    const displayS = isBusted ? 0 : dayState.scores.S;
+    const displayM = isBusted ? 0 : dayState.scores.M;
+
+    let html = `
+      <div class="day-record-card">
+        <div class="day-title">
+          <span>DAY ${currentDay}</span>
+          ${isBusted ? '<span class="badge bust-tag">BUSTED 爆牌!</span>' : `<span style="font-size:12px; color:var(--main-dark);">餘 ${24 - dayState.time}h</span>`}
+        </div>
+    `;
+
+    ['L', 'H', 'S', 'M'].forEach(key => {
+      html += `
+        <div class="aspect-row">
+          <div class="aspect-info">
+            <span class="aspect-label">${aspectNames[key]}</span>
+            <span class="aspect-score ${isBusted ? 'busted' : ''}">${eval('display'+key)}</span>
+          </div>
+          <div class="aspect-actions">
+            <button class="act-btn" onclick="doAction('${key}', 'add')">+1</button>
+            <button class="act-btn" onclick="doAction('${key}', 'sub')">-1</button>
+          </div>
+        </div>
+      `;
+    });
+
+    html += `
+        <div class="time-tracker ${isBusted ? 'busted' : ''}">
+          今日總耗時: ${dayState.time} / 24 小時
+          ${isBusted ? '<div class="busted-overlay">⚠️ 已爆牌！當日得分以 0 計算</div>' : ''}
+        </div>
+      </div>
+    `;
+    
+    container.innerHTML = html;
+    
+    document.getElementById('undoBtn').style.display = dayState.history.length > 0 ? 'block' : 'none';
+
+    if (currentDay === TOTAL_DAYS) {
+      document.getElementById('nextDayBtn').style.display = 'none';
+      document.getElementById('calcBtn').style.display = 'block';
+    } else {
+      document.getElementById('nextDayBtn').style.display = 'block';
+      document.getElementById('calcBtn').style.display = 'none';
+    }
+  }
+
+  window.doAction = (aspect, type) => {
+    let actualScoreChange = 0;
+    let actualTimeChange = 0;
+
+    if (type === 'add') {
+      actualScoreChange = 1;
+      actualTimeChange = 1;
+    } else if (type === 'sub') {
+      if (dayState.scores[aspect] > 0) actualScoreChange = -1;
+      actualTimeChange = 1;
+    }
+
+    dayState.scores[aspect] += actualScoreChange;
+    dayState.time += actualTimeChange;
+    
+    if (dayState.time < 0) dayState.time = 0;
+
+    dayState.history.push({
+      aspect: aspect,
+      dScore: actualScoreChange,
+      dTime: actualTimeChange
+    });
+
+    renderDayUI();
+  };
+
+  window.undoAction = () => {
+    if (dayState.history.length === 0) return;
+    const last = dayState.history.pop();
+    dayState.scores[last.aspect] -= last.dScore;
+    dayState.time -= last.dTime;
+    renderDayUI();
+  };
+
+  function saveAndResetDay() {
+    const isBusted = dayState.time > 24;
+    dailyData.push({
+      l: isBusted ? 0 : dayState.scores.L,
+      h: isBusted ? 0 : dayState.scores.H,
+      s: isBusted ? 0 : dayState.scores.S,
+      m: isBusted ? 0 : dayState.scores.M,
+      t: dayState.time,
+      busted: isBusted ? 1 : 0
+    });
+
+    dayState = {
+      scores: { L: 6, H: 6, S: 0, M: 0 },
+      time: 12,
+      history: []
+    };
+  }
+
+  document.getElementById('nextDayBtn').onclick = () => {
+    saveAndResetDay();
+    currentDay++;
+    renderDayUI();
+    window.scrollTo(0, 0);
+  };
+
+  document.getElementById('calcBtn').onclick = () => {
+    saveAndResetDay(); 
+    
+    let sumL=0, sumH=0, sumS=0, sumM=0, totalBusts=0;
+    dailyData.forEach(data => {
+      sumL += data.l;
+      sumH += data.h;
+      sumS += data.s;
+      sumM += data.m;
+      totalBusts += data.busted;
+    });
+
+    const gap = Math.max(sumL, sumH, sumS, sumM) - Math.min(sumL, sumH, sumS, sumM);
+    const totalScore = sumL + sumH + sumS + sumM;
+
+    document.getElementById('score-card').style.display = 'none';
+    document.getElementById('result-wrapper').style.display = 'block';
+    document.getElementById('resName').innerText = `冒險者：${user}`;
+    
+    drawRadar(sumL, sumH, sumS, sumM);
+    runAnalysis(sumL, sumH, sumS, sumM, gap, totalScore, totalBusts);
+  };
+
+  function runAnalysis(L, H, S, M, gap, total, busts) {
+    const scoresArray = [
+      { name: '學習', score: L },
+      { name: '健康', score: H },
+      { name: '社交', score: S },
+      { name: '心情', score: M }
+    ];
+    scoresArray.sort((a, b) => b.score - a.score);
+
+    let rankHtml = '<div class="rank-list">';
+    scoresArray.forEach((item, index) => {
+      rankHtml += `第 ${index + 1} 名：${item.name} (${item.score} 分)<br>`;
+    });
+    rankHtml += '</div>';
+
+    let type = "";
+    if (busts === 3) type = "【極限超載者】連續爆牌，你需要放慢腳步好好休息！";
+    else if (gap <= 5 && total > 30) type = "【全方位平衡高手】時間管理王者！";
+    else {
+      const top = scoresArray[0].name;
+      if (top === '學習') type = "【學習衝刺型】目標感強，但別忘了休息。";
+      else if (top === '健康') type = "【健康守門員】作息穩定，是長跑型選手。";
+      else if (top === '社交') type = "【社交連結者】人際關係滿分，注意分配給自己時間。";
+      else type = "【快樂追尋者】在意情緒品質，記得面對現實壓力。";
+    }
+
+    document.getElementById('analysisResult').innerHTML = `
+      <div style="font-size: 15px; font-weight: 900; color: var(--main-dark); border-bottom: 2px solid var(--main-dark); margin-bottom: 8px; padding-bottom: 4px;">總結算數據</div>
+      <div style="font-size: 14px; margin-bottom: 10px;">
+        總計得分：<b>${total}</b> 分<br>
+        平衡差距：<b>${gap}</b><br>
+        爆牌次數：<b style="color:var(--red);">${busts}</b> 次
+      </div>
+      <div style="font-size: 14px; font-weight: bold; color: var(--main-light); background:var(--main-dark); padding:4px 8px; border-radius:4px; display:inline-block; margin-top:5px;">四面向累計排名：</div>
+      ${rankHtml}
+      <div style="font-size: 14px; line-height: 1.5; font-weight: bold; margin-top: 15px; padding-top:10px; border-top: 1px dashed #dcd1c4;">
+        💡 評語：${type}
+      </div>
+    `;
+  }
+
+  function drawRadar(L, H, S, M) {
+    new Chart(document.getElementById('radarChart'), {
+      type: 'radar',
+      data: {
+        labels: ['學習', '健康', '社交', '心情'],
+        datasets: [{
+          data: [L, H, S, M],
+          backgroundColor: 'rgba(155, 186, 84, 0.3)', 
+          borderColor: '#9BBA54', 
+          borderWidth: 3,
+          pointBackgroundColor: '#453020', 
+          pointRadius: 4
+        }]
+      },
+      options: {
+        scales: {
+          r: {
+            beginAtZero: true,
+            ticks: { display: false },
+            pointLabels: { font: { size: 13, weight: 'bold' }, color: '#453020' } 
+          }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
+
+  document.getElementById('downloadBtn').onclick = () => {
+    const btn = document.getElementById('downloadBtn');
+    btn.innerText = "生成圖片中...";
+    html2canvas(document.getElementById('capture-area'), { scale: 2, backgroundColor: '#F9F6F0' }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = `Balance_Report_${user}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+      btn.innerText = "下載分析結果圖片";
+    });
+  };
+</script>
+
+</body>
+</html>
