@@ -29,15 +29,21 @@
       color: var(--text); 
       -webkit-tap-highlight-color: transparent; 
     }
+
+    button {
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
     
-    .container { width: 100%; max-width: 450px; margin: 0 auto; padding: 12px; }
+    .container { width: 100%; max-width: 450px; margin: 0 auto; padding: 10px; }
     
     .card { 
       background: var(--cream); 
       border-radius: var(--border-radius); 
-      padding: 20px; 
-      margin-bottom: 16px; 
-      box-shadow: 0 8px 0 rgba(0,0,0,0.2); 
+      padding: 14px 16px; 
+      margin-bottom: 10px; 
+      box-shadow: 0 6px 0 rgba(0,0,0,0.2); 
       border: 3px solid var(--white);
     }
     
@@ -46,7 +52,7 @@
     
     /* 規則區塊新樣式 */
     .rule-header {
-      font-size: 1.1rem; 
+      font-size: 1.05rem; 
       margin: 0; 
       cursor: pointer; 
       display: flex; 
@@ -54,14 +60,14 @@
       align-items: center;
     }
     .rule-toggle-icon {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       background: var(--main-dark);
       color: var(--main-light);
-      padding: 4px 10px;
+      padding: 3px 10px;
       border-radius: 20px;
       font-weight: bold;
     }
-    .rule-box { font-size: 13px; line-height: 1.5; margin-top: 15px; }
+    .rule-box { font-size: 13px; line-height: 1.5; margin-top: 12px; }
     .rule-item { display: flex; border-bottom: 1px solid #dcd1c4; padding: 8px 0; }
     .rule-item:last-child { border-bottom: none; padding-bottom: 0; }
     .rule-label { font-weight: bold; width: 75px; flex-shrink: 0; color: var(--main-dark); }
@@ -72,7 +78,8 @@
     .logo-img {
       max-width: 50%; /* 控制圖片最大寬度 */
       height: auto;
-      margin-bottom: 15px;
+      margin-bottom: 40px;
+      margin-top: 50px;
     }
 
     .mobile-input { 
@@ -81,57 +88,147 @@
       color: var(--main-dark); font-weight: bold;
     }
 
+    /* 回合切換標籤 */
+    .day-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .day-tab {
+      flex: 1;
+      padding: 7px 0;
+      border: 2px solid var(--main-dark);
+      border-radius: 10px;
+      background: var(--white);
+      color: var(--main-dark);
+      font-weight: 900;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+    .day-tab:active { transform: scale(0.95); }
+    .day-tab.active {
+      background: var(--main-dark);
+      color: var(--main-light);
+    }
+
     .day-record-card {
       background: var(--white); border: 2px solid var(--main-dark); border-radius: 12px;
-      padding: 15px; margin-bottom: 15px;
+      padding: 12px; margin-bottom: 10px;
     }
     .day-title {
       font-weight: 900; color: var(--main-dark); border-bottom: 2px solid #eee;
-      margin-bottom: 12px; padding-bottom: 8px; display: flex;
-      justify-content: space-between; align-items: center; font-size: 1.1rem;
+      margin-bottom: 8px; padding-bottom: 6px; display: flex;
+      justify-content: space-between; align-items: center; font-size: 1.05rem;
     }
     
     .aspect-row {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 10px 0; border-bottom: 1px dashed #dcd1c4;
+      padding: 6px 0; border-bottom: 1px dashed #dcd1c4;
     }
     .aspect-row:last-child { border-bottom: none; }
-    .aspect-info { display: flex; align-items: center; width: 45%; }
+    .aspect-info { display: flex; align-items: center; flex: 1; }
+    
+    .aspect-icon {
+      width: 44px;
+      height: 44px;
+      margin-right: 6px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    
     .aspect-label { font-weight: bold; font-size: 14px; margin-right: 8px; color: var(--main-dark); }
     .aspect-score { 
       background: var(--main-dark); color: var(--main-light); padding: 4px 10px; 
-      border-radius: 8px; font-weight: bold; font-size: 16px; min-width: 40px; text-align: center;
+      border-radius: 8px; font-weight: bold; font-size: 16px; min-width: 38px; text-align: center;
+      display: inline-block;
     }
     
-    .aspect-actions { display: flex; gap: 10px; width: 55%; justify-content: flex-end; }
+    .aspect-actions { display: flex; gap: 8px; justify-content: flex-end; }
     .act-btn {
-      border: 2px solid var(--main-dark); border-radius: 6px; background: #fff;
-      font-weight: bold; padding: 6px 0; width: 50px; cursor: pointer;
-      font-size: 15px; transition: 0.1s; color: var(--main-dark);
+      border: 2px solid var(--main-dark); border-radius: 8px; background: #fff;
+      font-weight: 900; padding: 6px 0; width: 48px; cursor: pointer;
+      font-size: 15px; transition: transform 0.08s, background 0.1s; color: var(--main-dark);
+      box-shadow: 0 3px 0 var(--main-dark);
     }
-    .act-btn:active { transform: scale(0.95); background: #eee; }
+    .act-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 0 0 var(--main-dark);
+      background: var(--main-light);
+    }
+
+    /* 按鍵點擊後的即時回饋動畫（重繪後仍可見） */
+    .btn-flash-add { animation: flashAdd 0.22s ease-out; }
+    .btn-flash-sub { animation: flashSub 0.22s ease-out; }
+    .score-pop-add { animation: scorePopAdd 0.28s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
+    .score-pop-sub { animation: scorePopSub 0.28s ease-out; }
+    .time-pulse { animation: timePulse 0.25s ease-out; }
+
+    @keyframes flashAdd {
+      0% { transform: translateY(3px); box-shadow: 0 0 0 var(--main-dark); background: var(--main-light); color: var(--main-dark); }
+      100% { transform: translateY(0); box-shadow: 0 3px 0 var(--main-dark); background: #fff; }
+    }
+    @keyframes flashSub {
+      0% { transform: translateY(3px); box-shadow: 0 0 0 var(--main-dark); background: #f39c12; color: #fff; }
+      100% { transform: translateY(0); box-shadow: 0 3px 0 var(--main-dark); background: #fff; }
+    }
+    @keyframes scorePopAdd {
+      0% { transform: scale(1); }
+      45% { transform: scale(1.35); background: var(--main-light); color: var(--main-dark); }
+      100% { transform: scale(1); }
+    }
+    @keyframes scorePopSub {
+      0% { transform: scale(1); }
+      45% { transform: scale(0.82); background: var(--red); color: #fff; }
+      100% { transform: scale(1); }
+    }
+    @keyframes timePulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
 
     .time-tracker {
       background: #f4f6f0; border: 2px solid var(--main-light); border-radius: 8px;
-      padding: 12px; text-align: center; margin-top: 15px; font-weight: bold; font-size: 15px;
+      padding: 9px; text-align: center; margin-top: 10px; font-weight: bold; font-size: 14px;
       color: var(--main-dark);
     }
     .time-tracker.busted { background: #fee2e2; border-color: var(--red); color: var(--red); }
 
     .btn { 
       width: 100%; padding: 16px; border-radius: 50px; border: none; 
-      font-size: 17px; font-weight: 900; cursor: pointer; transition: 0.2s; 
+      font-size: 17px; font-weight: 900; cursor: pointer; transition: transform 0.08s, box-shadow 0.08s; 
       margin-top: 10px; box-shadow: 0 5px 0 rgba(0,0,0,0.15);
     }
-    .btn-main { background: var(--main-light); color: var(--main-dark); box-shadow: 0 5px 0 #7A9641; }
-    .btn-main:active { transform: translateY(3px); box-shadow: 0 2px 0 #7A9641; }
+    .btn-main { background: var(--main-light); color: var(--main-dark); box-shadow: 0 4px 0 #7A9641; }
+    .btn-main:active { transform: translateY(4px); box-shadow: 0 0 0 #7A9641; filter: brightness(0.95); }
     
-    .btn-save { background: var(--main-dark); color: var(--main-light); }
-    .btn-secondary { background: #95a5a6; color: white; }
-    .btn-undo { background: #e67e22; color: white; margin-bottom: 10px; box-shadow: 0 4px 0 #d35400; }
+    .btn-save { background: var(--main-dark); color: var(--main-light); box-shadow: 0 4px 0 #2b1d13; }
+    .btn-save:active { transform: translateY(4px); box-shadow: 0 0 0 #2b1d13; filter: brightness(1.15); }
+    .btn-secondary { background: #95a5a6; color: white; box-shadow: 0 4px 0 #7f8c8d; }
+    .btn-secondary:active { transform: translateY(4px); box-shadow: 0 0 0 #7f8c8d; filter: brightness(0.92); }
+    .btn-undo { background: #e67e22; color: white; box-shadow: 0 4px 0 #d35400; }
+    .btn-undo:active { transform: translateY(4px); box-shadow: 0 0 0 #d35400; filter: brightness(0.95); }
+
+    /* 下方方形並排按鍵容器 */
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .btn-row .btn {
+      flex: 1;
+      width: auto;
+      border-radius: 10px;
+      padding: 13px 6px;
+      font-size: 14px;
+      margin-top: 0;
+      margin-bottom: 0;
+      line-height: 1.2;
+    }
 
     .busted-overlay {
-      color: var(--red); font-weight: bold; font-size: 13px; text-align: center; margin-top: 5px;
+      color: var(--red); font-weight: bold; font-size: 12px; text-align: center; margin-top: 4px;
     }
 
     .badge { font-size: 10px; padding: 3px 6px; border-radius: 4px; font-weight: bold; color: white;}
@@ -139,10 +236,12 @@
 
     .personality-card { 
       background: var(--white); border: 3px solid var(--main-dark); 
-      padding: 16px; border-radius: var(--border-radius); margin-top: 15px;
+      padding: 14px; border-radius: var(--border-radius); margin-top: 12px;
     }
 
-    .rank-list { margin-top: 10px; padding-left: 20px; font-size: 14px; font-weight: bold; line-height: 1.6;}
+    .rank-list { margin-top: 10px; padding-left: 10px; font-size: 14px; font-weight: bold; line-height: 1.6; }
+    .rank-item { display: flex; align-items: center; margin-bottom: 6px; }
+    .rank-icon { width: 28px; height: 28px; margin: 0 6px; object-fit: contain; flex-shrink: 0; }
     canvas { max-width: 100% !important; height: auto !important; }
   </style>
 </head>
@@ -155,10 +254,10 @@
       <span class="rule-toggle-icon" id="ruleIcon">▼ 展開</span>
     </h2>
     <div class="rule-box" id="ruleContent" style="display: none;">
-      <div class="rule-item"><div class="rule-label">基本設置</div><div>每日含有固定作息（12小時）。<br>所剩 12 小時為可自由分配時間。</div></div>
-      <div class="rule-item"><div class="rule-label">操作計時</div><div>每按一次「＋1」或「－1」，耗時即增加1小時。<br>分數最低為0，但降至0後再扣減，<b>耗時仍會累加</b>。</div></div>
-      <div class="rule-item"><div class="rule-label">特殊操作</div><div><b>撤銷：</b>還原上一步誤按的操作及時間。</div></div>
-      <div class="rule-item"><div class="rule-label">爆牌歸零</div><div>累計超過24小時即爆牌，<b>當日四項得分歸零</b>並記一次爆牌（不額外增加耗時）。</div></div>
+      <div class="rule-item"><div class="rule-label">基本設置</div><div>遊戲共進行 3 天。每天開始時，上學與睡覺合計占用 12 小時，已預先計入 APP，玩家無須配置日常卡。</div></div>
+      <div class="rule-item"><div class="rule-label">初始分數</div><div>學習、健康、社交與心情每日皆從 0 分開始。</div></div>
+      <div class="rule-item"><div class="rule-label">行程記錄</div><div>使用剩餘 12 小時安排行程，並依卡面記錄活動與事件造成的耗時及分數變化（分數降至 0 後再扣減，<b>耗時仍會累加</b>）。</div></div>
+      <div class="rule-item"><div class="rule-label">爆牌歸零</div><div>若當日累積耗時超過 24 小時即爆牌，<b>當日四項分數歸零</b>並記一次爆牌。</div></div>
     </div>
   </div>
 
@@ -170,31 +269,95 @@
   </div>
 
   <div class="card" id="score-card" style="display:none;">
-    <h2 id="pNameDisplay" style="font-size: 1rem; margin-bottom: 15px; border-bottom: 2px solid var(--main-dark); display: inline-block;"></h2>
+    <h2 id="pNameDisplay" style="font-size: 0.95rem; margin-bottom: 10px; border-bottom: 2px solid var(--main-dark); display: inline-block;"></h2>
+    <!-- 三天快速切換標籤 -->
+    <div class="day-tabs" id="dayTabs"></div>
     <div id="currentDayArea"></div>
-    <button class="btn btn-undo" id="undoBtn" onclick="undoAction()">↺ 撤銷上一步</button>
-    <button class="btn btn-main" id="nextDayBtn">儲存並進入下一回合</button>
-    <button class="btn btn-main" id="calcBtn" style="display:none;">產出結算報告</button>
+    <!-- 下方三個方形並排按鍵 -->
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="prevDayBtn" style="display:none;">← 上一回合</button>
+      <button class="btn btn-undo" id="undoBtn" onclick="undoAction()" style="display:none;">↺ 撤銷</button>
+      <button class="btn btn-main" id="nextDayBtn">下一回合 →</button>
+      <button class="btn btn-main" id="calcBtn" style="display:none;">結算報告</button>
+    </div>
   </div>
 
   <div id="result-wrapper" style="display:none;">
     <div class="card" id="capture-area">
-      <h2 style="margin-bottom: 10px; font-size: 1.3rem;">最終生命平衡輪報告</h2>
-      <p id="resName" style="text-align:center; font-size: 13px; font-weight: bold; color: var(--main-dark); margin-bottom: 10px;"></p>
+      <h2 style="margin-bottom: 8px; font-size: 1.25rem;">最終生命平衡輪報告</h2>
+      <p id="resName" style="text-align:center; font-size: 13px; font-weight: bold; color: var(--main-dark); margin-bottom: 8px;"></p>
       
       <canvas id="radarChart"></canvas>
       <div id="analysisResult" class="personality-card"></div>
     </div>
-    <div class="container" style="padding: 0;">
-      <button class="btn btn-save" id="downloadBtn">下載分析結果圖片</button>
+    <div class="btn-row">
+      <button class="btn btn-save" id="downloadBtn">下載圖片</button>
+      <button class="btn btn-main" id="backToEditBtn">修改分數</button>
       <button class="btn btn-secondary" onclick="location.reload()">重新挑戰</button>
     </div>
   </div>
 </div>
 
 <script>
+  // 輕量級按鈕音效與震動回饋（無須外部音檔）
+  let audioCtx = null;
+  function playFeedback(type = 'tap') {
+    // 觸覺震動（Android 支援，iOS 自動略過）
+    if (navigator.vibrate) {
+      navigator.vibrate(type === 'bust' ? [40, 30, 40] : 15);
+    }
+
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      if (!audioCtx) audioCtx = new AudioContext();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      const now = audioCtx.currentTime;
+      if (type === 'add') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(520, now);
+        osc.frequency.exponentialRampToValueAtTime(760, now + 0.06);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+        osc.start(now);
+        osc.stop(now + 0.07);
+      } else if (type === 'sub') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(360, now);
+        osc.frequency.exponentialRampToValueAtTime(240, now + 0.07);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      } else if (type === 'bust') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.linearRampToValueAtTime(110, now + 0.18);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      } else {
+        // 一般切換 / 撤銷按鍵
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, now);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      }
+    } catch (e) {}
+  }
+
   // 規則區塊收合控制
   function toggleRules() {
+    playFeedback('tap');
     const content = document.getElementById('ruleContent');
     const icon = document.getElementById('ruleIcon');
     if (content.style.display === 'none') {
@@ -209,17 +372,33 @@
   let user = "";
   let currentDay = 1;
   const TOTAL_DAYS = 3; 
-  const dailyData = [];
+  let radarChartInstance = null;
 
-  let dayState = {
-    scores: { L: 6, H: 6, S: 0, M: 0 },
-    time: 12,
-    history: []
-  };
+  // 獨立儲存每一天的狀態，切換回合或返回修改時資料都會完整保留
+  function createEmptyDay() {
+    return {
+      scores: { L: 0, H: 0, S: 0, M: 0 },
+      time: 12,
+      history: []
+    };
+  }
+  const allDaysState = Array.from({ length: TOTAL_DAYS }, createEmptyDay);
 
   const aspectNames = { L: '學習', H: '健康', S: '社交', M: '心情' };
 
+  // ==========================================
+  // 👇 【放照片的地方】請把下面四個檔名換成你的 PNG 路徑 👇
+  // ==========================================
+  const aspectIcons = {
+    L: './icon_learning.png', // 學習的 PNG
+    H: './icon_health.png',   // 健康的 PNG
+    S: './icon_social.png',   // 社交的 PNG
+    M: './icon_mood.png'      // 心情的 PNG
+  };
+  // ==========================================
+
   document.getElementById('startBtn').onclick = () => {
+    playFeedback('tap');
     user = document.getElementById('playerName').value.trim();
     if (!user) return alert("請輸入姓名");
     document.getElementById('setup-card').style.display = 'none';
@@ -228,14 +407,31 @@
     renderDayUI();
   };
 
-  function renderDayUI() {
+  window.switchDay = (dayNum) => {
+    playFeedback('tap');
+    currentDay = dayNum;
+    renderDayUI();
+    window.scrollTo(0, 0);
+  };
+
+  function renderDayUI(feedback = null) {
+    // 渲染上方 DAY 1 / DAY 2 / DAY 3 切換標籤
+    let tabsHtml = '';
+    for (let i = 1; i <= TOTAL_DAYS; i++) {
+      tabsHtml += `<button class="day-tab ${i === currentDay ? 'active' : ''}" onclick="switchDay(${i})">DAY ${i}</button>`;
+    }
+    document.getElementById('dayTabs').innerHTML = tabsHtml;
+
     const container = document.getElementById('currentDayArea');
+    const dayState = allDaysState[currentDay - 1];
     const isBusted = dayState.time > 24;
     
-    const displayL = isBusted ? 0 : dayState.scores.L;
-    const displayH = isBusted ? 0 : dayState.scores.H;
-    const displayS = isBusted ? 0 : dayState.scores.S;
-    const displayM = isBusted ? 0 : dayState.scores.M;
+    const displayScores = {
+      L: isBusted ? 0 : dayState.scores.L,
+      H: isBusted ? 0 : dayState.scores.H,
+      S: isBusted ? 0 : dayState.scores.S,
+      M: isBusted ? 0 : dayState.scores.M
+    };
 
     let html = `
       <div class="day-record-card">
@@ -246,22 +442,28 @@
     `;
 
     ['L', 'H', 'S', 'M'].forEach(key => {
+      const isTarget = feedback && feedback.aspect === key;
+      const scoreAnimClass = isTarget ? (feedback.type === 'add' ? 'score-pop-add' : 'score-pop-sub') : '';
+      const addBtnAnim = isTarget && feedback.type === 'add' ? 'btn-flash-add' : '';
+      const subBtnAnim = isTarget && feedback.type === 'sub' ? 'btn-flash-sub' : '';
+
       html += `
         <div class="aspect-row">
           <div class="aspect-info">
+            <img src="${aspectIcons[key]}" alt="${aspectNames[key]}" class="aspect-icon">
             <span class="aspect-label">${aspectNames[key]}</span>
-            <span class="aspect-score ${isBusted ? 'busted' : ''}">${eval('display'+key)}</span>
+            <span class="aspect-score ${isBusted ? 'busted' : ''} ${scoreAnimClass}">${displayScores[key]}</span>
           </div>
           <div class="aspect-actions">
-            <button class="act-btn" onclick="doAction('${key}', 'add')">+1</button>
-            <button class="act-btn" onclick="doAction('${key}', 'sub')">-1</button>
+            <button class="act-btn ${addBtnAnim}" onclick="doAction('${key}', 'add')">+1</button>
+            <button class="act-btn ${subBtnAnim}" onclick="doAction('${key}', 'sub')">-1</button>
           </div>
         </div>
       `;
     });
 
     html += `
-        <div class="time-tracker ${isBusted ? 'busted' : ''}">
+        <div class="time-tracker ${isBusted ? 'busted' : ''} ${feedback ? 'time-pulse' : ''}">
           今日總耗時: ${dayState.time} / 24 小時
           ${isBusted ? '<div class="busted-overlay">⚠️ 已爆牌！當日得分以 0 計算</div>' : ''}
         </div>
@@ -270,7 +472,9 @@
     
     container.innerHTML = html;
     
+    // 控制按鈕顯示狀態
     document.getElementById('undoBtn').style.display = dayState.history.length > 0 ? 'block' : 'none';
+    document.getElementById('prevDayBtn').style.display = currentDay > 1 ? 'block' : 'none';
 
     if (currentDay === TOTAL_DAYS) {
       document.getElementById('nextDayBtn').style.display = 'none';
@@ -282,6 +486,8 @@
   }
 
   window.doAction = (aspect, type) => {
+    const dayState = allDaysState[currentDay - 1];
+    const wasBusted = dayState.time > 24;
     let actualScoreChange = 0;
     let actualTimeChange = 0;
 
@@ -304,52 +510,64 @@
       dTime: actualTimeChange
     });
 
-    renderDayUI();
+    // 若剛好觸發爆牌，播放爆牌警示音
+    if (!wasBusted && dayState.time > 24) {
+      playFeedback('bust');
+    } else {
+      playFeedback(type);
+    }
+
+    renderDayUI({ aspect, type });
   };
 
   window.undoAction = () => {
+    const dayState = allDaysState[currentDay - 1];
     if (dayState.history.length === 0) return;
+    playFeedback('tap');
     const last = dayState.history.pop();
     dayState.scores[last.aspect] -= last.dScore;
     dayState.time -= last.dTime;
-    renderDayUI();
+    renderDayUI({ aspect: last.aspect, type: 'sub' });
   };
 
-  function saveAndResetDay() {
-    const isBusted = dayState.time > 24;
-    dailyData.push({
-      l: isBusted ? 0 : dayState.scores.L,
-      h: isBusted ? 0 : dayState.scores.H,
-      s: isBusted ? 0 : dayState.scores.S,
-      m: isBusted ? 0 : dayState.scores.M,
-      t: dayState.time,
-      busted: isBusted ? 1 : 0
-    });
-
-    dayState = {
-      scores: { L: 6, H: 6, S: 0, M: 0 },
-      time: 12,
-      history: []
-    };
-  }
-
+  // 進入下一回合
   document.getElementById('nextDayBtn').onclick = () => {
-    saveAndResetDay();
-    currentDay++;
+    if (currentDay < TOTAL_DAYS) {
+      switchDay(currentDay + 1);
+    }
+  };
+
+  // 回到上一回合
+  document.getElementById('prevDayBtn').onclick = () => {
+    if (currentDay > 1) {
+      switchDay(currentDay - 1);
+    }
+  };
+
+  // 從結算頁返回修改分數
+  document.getElementById('backToEditBtn').onclick = () => {
+    playFeedback('tap');
+    document.getElementById('result-wrapper').style.display = 'none';
+    document.getElementById('score-card').style.display = 'block';
     renderDayUI();
     window.scrollTo(0, 0);
   };
 
+  // 產出結算報告
   document.getElementById('calcBtn').onclick = () => {
-    saveAndResetDay(); 
-    
-    let sumL=0, sumH=0, sumS=0, sumM=0, totalBusts=0;
-    dailyData.forEach(data => {
-      sumL += data.l;
-      sumH += data.h;
-      sumS += data.s;
-      sumM += data.m;
-      totalBusts += data.busted;
+    playFeedback('add');
+    let sumL = 0, sumH = 0, sumS = 0, sumM = 0, totalBusts = 0;
+
+    allDaysState.forEach(day => {
+      const isBusted = day.time > 24;
+      if (isBusted) {
+        totalBusts += 1;
+      } else {
+        sumL += day.scores.L;
+        sumH += day.scores.H;
+        sumS += day.scores.S;
+        sumM += day.scores.M;
+      }
     });
 
     const gap = Math.max(sumL, sumH, sumS, sumM) - Math.min(sumL, sumH, sumS, sumM);
@@ -361,20 +579,27 @@
     
     drawRadar(sumL, sumH, sumS, sumM);
     runAnalysis(sumL, sumH, sumS, sumM, gap, totalScore, totalBusts);
+    window.scrollTo(0, 0);
   };
 
   function runAnalysis(L, H, S, M, gap, total, busts) {
     const scoresArray = [
-      { name: '學習', score: L },
-      { name: '健康', score: H },
-      { name: '社交', score: S },
-      { name: '心情', score: M }
+      { key: 'L', name: '學習', score: L },
+      { key: 'H', name: '健康', score: H },
+      { key: 'S', name: '社交', score: S },
+      { key: 'M', name: '心情', score: M }
     ];
     scoresArray.sort((a, b) => b.score - a.score);
 
     let rankHtml = '<div class="rank-list">';
     scoresArray.forEach((item, index) => {
-      rankHtml += `第 ${index + 1} 名：${item.name} (${item.score} 分)<br>`;
+      rankHtml += `
+        <div class="rank-item">
+          <span>第 ${index + 1} 名：</span>
+          <img src="${aspectIcons[item.key]}" alt="${item.name}" class="rank-icon">
+          <span>${item.name} (${item.score} 分)</span>
+        </div>
+      `;
     });
     rankHtml += '</div>';
 
@@ -405,7 +630,10 @@
   }
 
   function drawRadar(L, H, S, M) {
-    new Chart(document.getElementById('radarChart'), {
+    if (radarChartInstance) {
+      radarChartInstance.destroy();
+    }
+    radarChartInstance = new Chart(document.getElementById('radarChart'), {
       type: 'radar',
       data: {
         labels: ['學習', '健康', '社交', '心情'],
@@ -432,14 +660,15 @@
   }
 
   document.getElementById('downloadBtn').onclick = () => {
+    playFeedback('tap');
     const btn = document.getElementById('downloadBtn');
-    btn.innerText = "生成圖片中...";
+    btn.innerText = "生成中...";
     html2canvas(document.getElementById('capture-area'), { scale: 2, backgroundColor: '#F9F6F0' }).then(canvas => {
       const link = document.createElement('a');
       link.download = `Balance_Report_${user}.png`;
       link.href = canvas.toDataURL();
       link.click();
-      btn.innerText = "下載分析結果圖片";
+      btn.innerText = "下載圖片";
     });
   };
 </script>
